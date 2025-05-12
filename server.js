@@ -20,10 +20,12 @@ const io = new Server(server, {
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   },
 });
-app.use(cors({
-  origin: ['https://task-quest-gamify.lovable.app', 'http://localhost:5173'],
-  credentials: true // Đảm bảo gửi cookies nếu cần
-}));
+app.use(
+  cors({
+    origin: ["https://epic-task-frontend.vercel.app", "http://localhost:5173"],
+    credentials: true, // Đảm bảo gửi cookies nếu cần
+  })
+);
 app.use(express.json());
 
 app.use((err, req, res, next) => {
