@@ -22,8 +22,12 @@ const io = new Server(server, {
 });
 app.use(
   cors({
-    origin: ["https://epic-task-frontend.vercel.app", "http://localhost:5173"],
-    credentials: true, // Đảm bảo gửi cookies nếu cần
+    origin: [
+      "https://epic-task-frontend.vercel.app","http://localhost:5173",
+    ],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
 );
 app.use(express.json());
@@ -42,13 +46,15 @@ const sessionStore = MongoStore.create({
 });
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'your-very-strong-secret-key',
+    secret: process.env.SESSION_SECRET || 'khóa-bí-mật-rất-mạnh',
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Sử dụng secure trong môi trường production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Quan trọng cho cookie giữa các site
     }
   })
 );
