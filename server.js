@@ -13,21 +13,19 @@ connectDB();
 
 const app = express();
 const server = http.createServer(app); // Tạo HTTP server
-const io = new Server(server, {
+const io = require("socket.io")(server, {
   cors: {
-    origin: ["https://epic-task-frontend.vercel.app/", "http://localhost:5173"],
+    origin: ["https://epic-task-frontend.vercel.app"],
+    methods: ["GET", "POST"],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   },
 });
 app.use(
   cors({
-    origin: [
-      "https://epic-task-frontend.vercel.app","http://localhost:5173",
-    ],
+    origin: ["https://epic-task-frontend.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "user-id"], // Thêm user-id vào đây
   })
 );
 app.use(express.json());
