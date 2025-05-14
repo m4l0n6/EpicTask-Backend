@@ -122,7 +122,3 @@ const startApp = async () => {
   }
 };
 startApp();
-
-const socket = io("https://epictask-backend.onrender.com", {
-  transports: ["websocket"],
-});
