@@ -28,9 +28,9 @@ function validateTelegramWebAppData(initData, botToken) {
 
 const createUsername = (telegramData) => {
   if (telegramData.username) {
-    return telegramData.username; // Sử dụng username nếu có
+    return telegramData.username;
   }
-  return `${telegramData.first_name || ''} ${telegramData.last_name || ''}`.trim(); // Tạo tên từ first_name và last_name
+  return `${telegramData.first_name || ''} ${telegramData.last_name || ''}`.trim();
 };
 
 const telegramLoginOrRegister = async (req, res, next) => {
@@ -121,36 +121,15 @@ const processDailyLogin = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const now = new Date();
-    const today = new Date(now.setHours(0, 0, 0, 0)); // Đặt thời gian về 00:00:00
+    const today = new Date();
     const lastLogin = user.lastDailyLogin ? new Date(user.lastDailyLogin) : null;
-
-    // Kiểm tra xem đây có phải lần đăng nhập đầu tiên trong ngày không
     const isFirstLogin = !lastLogin || lastLogin.toDateString() !== today.toDateString();
 
     if (isFirstLogin) {
-      // Tính streak
-      let newStreak = 1;
-      if (lastLogin) {
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        if (lastLogin.toDateString() === yesterday.toDateString()) {
-          newStreak = (user.dailyLoginStreak || 0) + 1;
-        }
-      }
-
-      // Tính toán phần thưởng token
-      const tokensAwarded = 5; // Ví dụ: phần thưởng token cơ bản
       user.lastDailyLogin = today;
-      user.dailyLoginStreak = newStreak;
-      user.tokens += tokensAwarded;
+      user.tokens += 5; // Thêm token
       await user.save();
-
-      return res.status(200).json({
-        isFirstLogin: true,
-        tokensAwarded,
-        currentStreak: newStreak,
-      });
+      return res.status(200).json({ isFirstLogin: true, tokensAwarded: 5 });
     }
 
     // Nếu không phải lần đăng nhập đầu tiên trong ngày

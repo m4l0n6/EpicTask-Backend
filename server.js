@@ -20,6 +20,7 @@ const io = require("socket.io")(server, {
     credentials: true,
   },
 });
+io.origins(["https://epic-task-frontend.vercel.app"]); // Cho phép WebSocket từ frontend
 app.use(
   cors({
     origin: ["https://epic-task-frontend.vercel.app"], // Cho phép frontend của bạn
@@ -91,6 +92,12 @@ io.on('connection', (socket) => {
 
 // Xuất đối tượng io để các module khác có thể sử dụng
 app.set('io', io);
+
+const cleanupSessions = async () => {
+  const now = new Date();
+  await Session.deleteMany({ expiresAt: { $lt: now } }); // Xóa session hết hạn
+};
+setInterval(cleanupSessions, 24 * 60 * 60 * 1000); // Chạy mỗi ngày
 
 const startApp = async () => {
   try {
