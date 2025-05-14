@@ -19,8 +19,7 @@ const io = require("socket.io")(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-});
-io.origins(["https://epic-task-frontend.vercel.app"]); // Cho phép WebSocket từ frontend
+}); // Cho phép WebSocket từ frontend
 app.use(
   cors({
     origin: ["https://epic-task-frontend.vercel.app"], // Cho phép frontend của bạn
