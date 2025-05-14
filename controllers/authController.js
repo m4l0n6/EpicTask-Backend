@@ -26,6 +26,13 @@ function validateTelegramWebAppData(initData, botToken) {
   return hash === data.get('hash');
 }
 
+const createUsername = (telegramData) => {
+  if (telegramData.username) {
+    return telegramData.username; // Sử dụng username nếu có
+  }
+  return `${telegramData.first_name || ''} ${telegramData.last_name || ''}`.trim(); // Tạo tên từ first_name và last_name
+};
+
 const telegramLoginOrRegister = async (req, res, next) => {
   console.log('\n--- [authController] Running telegramLoginOrRegister ---');
   console.log('[authController] Request Body:', req.body);
@@ -91,6 +98,20 @@ const telegramLoginOrRegister = async (req, res, next) => {
   }
 };
 
+const handleTelegramAuth = async (req, res) => {
+  const telegramData = req.body; // Dữ liệu Telegram từ frontend
+  const username = createUsername(telegramData);
+
+  // Lưu hoặc cập nhật người dùng trong cơ sở dữ liệu
+  const user = await User.findOneAndUpdate(
+    { telegramId: telegramData.id },
+    { username, ...otherData },
+    { upsert: true, new: true }
+  );
+
+  res.json(user);
+};
+
 const processDailyLogin = async (req, res, next) => {
   try {
     const userId = req.user.id; // Đảm bảo middleware đã gắn `req.user`
@@ -146,5 +167,6 @@ const processDailyLogin = async (req, res, next) => {
 
 module.exports = {
   telegramLoginOrRegister,
-  processDailyLogin
+  processDailyLogin,
+  handleTelegramAuth
 };
