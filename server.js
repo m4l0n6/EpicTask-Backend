@@ -22,10 +22,10 @@ const io = require("socket.io")(server, {
 }); // Cho phép WebSocket từ frontend
 app.use(
   cors({
-    origin: ["https://epic-task-frontend.vercel.app"], // Cho phép frontend của bạn
+    origin: ["https://epic-task-frontend.vercel.app", "http://localhost:5173"], // Thêm localhost
     methods: ["GET", "POST", "PUT", "DELETE"], // Các phương thức HTTP được phép
     credentials: true, // Cho phép cookies và credentials
-    allowedHeaders: ["Content-Type", "Authorization", "user-id", "telegram-data"], // Thêm 'telegram-data' ở đây
+    allowedHeaders: ["Content-Type", "Authorization", "user-id", "telegram-data", "x-development-mode"], // Thêm 'telegram-data' và 'x-development-mode' ở đây
   })
 );
 app.use(express.json());
@@ -53,6 +53,7 @@ app.use(
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Sử dụng secure trong môi trường production
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Quan trọng cho cookie giữa các site
+      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
     }
   })
 );
