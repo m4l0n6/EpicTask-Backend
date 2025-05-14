@@ -30,7 +30,7 @@ const createUsername = (telegramData) => {
   if (telegramData.username) {
     return telegramData.username;
   }
-  return `${telegramData.first_name || ''} ${telegramData.last_name || ''}`.trim();
+  return `${telegramData.first_name || ''} ${telegramData.last_name || ''}`.trim() || `user${telegramData.id}`;
 };
 
 const telegramLoginOrRegister = async (req, res, next) => {
