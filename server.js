@@ -22,10 +22,10 @@ const io = require("socket.io")(server, {
 });
 app.use(
   cors({
-    origin: ["https://epic-task-frontend.vercel.app"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "user-id"], // Thêm user-id vào đây
+    origin: ["https://epic-task-frontend.vercel.app"], // Cho phép frontend của bạn
+    methods: ["GET", "POST", "PUT", "DELETE"], // Các phương thức HTTP được phép
+    credentials: true, // Cho phép cookies và credentials
+    allowedHeaders: ["Content-Type", "Authorization", "user-id", "telegram-data"], // Thêm 'telegram-data' ở đây
   })
 );
 app.use(express.json());
