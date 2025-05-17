@@ -4,22 +4,12 @@ const cors = require('cors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/database');
-const http = require('http'); // Thêm module http
-const { Server } = require('socket.io'); // Thêm Socket.IO
 
 const { bootstrap } = require('./config/bootstrap');
  
 connectDB();  
 
 const app = express();
-const server = http.createServer(app); // Tạo HTTP server
-const io = require("socket.io")(server, {
-  cors: {
-    origin: ["https://epic-task-frontend.vercel.app"],
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-}); // Cho phép WebSocket từ frontend
 app.use(
   cors({
     origin: ["https://epic-task-frontend.vercel.app", "http://localhost:5173"], // Thêm localhost
@@ -75,24 +65,6 @@ app.use('/api/v1/badges', badgeRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-// Socket.IO connections
-io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
-  
-  // Lưu trữ userId khi client xác thực
-  socket.on('authenticate', (userId) => {
-    console.log(`User authenticated: ${userId}`);
-    socket.join(`user-${userId}`); // Thêm socket vào room riêng của user
-  });
-  
-  socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.id}`);
-  });
-});
-
-// Xuất đối tượng io để các module khác có thể sử dụng
-app.set('io', io);
-
 const cleanupSessions = async () => {
   const now = new Date();
   await Session.deleteMany({ expiresAt: { $lt: now } }); // Xóa session hết hạn
@@ -114,11 +86,10 @@ const startApp = async () => {
     });
     console.log('--- [server.js] Bootstrap hoàn thành, chuẩn bị chạy server Express ---');
 
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`-------------------------------------------------------`);
       console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
-      console.log(` WebSockets đã được kích hoạt!`);
-      console.log(` Môi trường: ${process.env.NODE_ENV || 'development'}`);
+      console.log(` Môi trường: ${process.env.NODE_ENV || "development"}`);
       console.log(` (Nhấn CTRL+C để dừng server)`);
       console.log(`-------------------------------------------------------`);
     });

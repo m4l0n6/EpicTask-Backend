@@ -3,8 +3,6 @@ const Task = require('../models/Task');
 const UserBadge = require('../models/UserBadge');
 const Badge = require('../models/Badge');
 const leaderboardService = require('./leaderboardService'); 
-const SocketService = require('./socketService');
-
 
 const LEVEL_XP_THRESHOLD = 100;  
 
@@ -25,16 +23,11 @@ const awardXp = async (userId, xpToAdd) => {
     const newLevel = Math.floor(newXp / 100) + 1;
 
     // Cập nhật thông tin người dùng
-    user.xp = newXp;
-    user.level = newLevel;
+    user.xp = newXp;    user.level = newLevel;
     await user.save();
 
     const leveledUp = newLevel > oldLevel;
 
-    // Kiểm tra và trao huy hiệu dựa trên các tiêu chí
-    if (leveledUp && io) {
-      SocketService.notifyLevelUp(io, userId, { oldLevel, newLevel });
-    }
 
     // 2. Kiểm tra số nhiệm vụ đã hoàn thành
     const completedTaskCount = await Task.countDocuments({
@@ -80,15 +73,8 @@ const checkAndAwardBadges = async (userId, criteria) => {
                 icon: badge.icon || "🏆",
                 milestoneType: badge.milestoneType,
                 milestoneValue: badge.milestoneValue
-              };
-              
-              newlyAwardedBadges.push(badgeToReturn);
-              
-              // Thêm thông báo qua WebSocket nếu io được cung cấp
-              if (io) {
-                SocketService.notifyNewBadge(io, userId, badgeToReturn);
+              };              newlyAwardedBadges.push(badgeToReturn);
               }
-            }
         }
         return newlyAwardedBadges;
     } catch (err) {
